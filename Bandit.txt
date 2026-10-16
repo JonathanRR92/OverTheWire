@@ -1,0 +1,83 @@
+level0 : using SSH, logging in to overthewire's server 
+ssh bandit0@bandit.labs.overthewire. -p 2220    (-p specify the port number) 
+bandit0 password 
+
+level0 - level1 :  
+ls
+cat readme (view filess contents) ---> 6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR
+
+level1 - level2 : 
+ls 
+cat ./- (require file location specification due to file being "-") ---> PK8fYLZg2hnHSz83plBL1iEPKdD3QToB
+
+level2 - level3 : file is "--spaces in this filename--" but cat cannot open like a normal file
+ls 
+cat ./--spaces\ in\ this\ filename--  (you can use TAB) to auto fill the dashes) --- > 7ZZ2LFrykP2zEyvBl4m3clcL7tGYJPME
+
+level3 - level4 : file is hidden 
+cd inhere 
+ls -al (lists all files even hidden, also list permisisons, owner, bits, and date created) 
+cat ./...Hiding-From-You --- > xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq
+
+level4 - level5 : lots of files in the dir, find a way to locate human readable text
+ls 
+cd inhere 
+file ./* (file allows you to find files specified, * is a wild card to view all files in the current dir and what kind 
+content they have) Example : 
+./-file04: data
+./-file05: data
+./-file06: data
+./-file07: ASCII text   (human readable)
+cat ./-file07 -----> 6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG
+
+level5 - level6 : you are given properties of the file human-readable 1033 bytes in size not executable
+ls 
+cd inhere (many folders in the directory) 
+find . -type f -size 1033c ! -executable
+
+
+this command also outputs this: specifies ASCII text and file description
+ find . -type f -size 1033c ! -executable -exec file {} \;
+./maybehere07/.file2: ASCII text, with very long lines (1000)
+
+cat ./maybehere07/.file2 ---> pXa26xhMWaC2SvDotA4r9EgZkulOeSBW
+
+level6 - level7 : password is found somewhere in the server with these attributes owned by user bandit7 owned by group bandit6 
+33 bytes in size
+cd ../../
+find -type f -size 33c -user bandit7 2>dev/null (the last part does not include any unwanted outputs such as permission denied etc)
+cat ./var/lib/dpkg/info/bandit7.password ---> Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3
+
+level7 -level8 : password for the next level is stored in the file data.txt next to the word millionth
+we use grep for this instance
+grep "millionth" data.txt (do not dare to open file) ---> millionth       VR1ljMayciFxbnUokuQmJFw6QC9VKtub
+
+level8 - level9 : password for the next level is stored in the file data.txt and is the only line of text that occurs only once
+we use piping
+sort data.txt | uniq -u ----> EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl
+
+level9 -level10 : password for the next level is stored in the file data.txt in one of the few human-readable strings, preceded by several ‘=’ characters.
+strings outputs readable data within a file that may also contain binary data. 
+string data.txt | grep "="   -----> B0s2khmbT9u0geKuOoVGW3JZKhndE3BG
+
+level10 -level11 : password for the next level is stored in the file data.txt, which contains base64 encoded data
+ls 
+cat data.txt (output) VGhlIHBhc3N3b3JkIGlzIHBZZk9ZNkh3VXNEajVyTDlVdnloVTdNQ212OHZONVJvCg==
+base64 -d data.txt (base64 -d decodes data in file) --->  The password is pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro
+
+you can encode data 
+echo -n "Hello World" | base64
+
+level11 - level12 : password for the next level is stored in the file data.txt, where all lowercase (a-z) and uppercase (A-Z) letters have been rotated by 13 positions 
+
+tr command replaces letters in words or in files 
+like in this challange 
+                  replace current   with these (14 spcaes) 
+cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+The password is GROozWPO8QyN0mGrjUkID0WCYkZiQxrN
+
+level12 - level13 : 
+
+
+
+
