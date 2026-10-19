@@ -76,8 +76,86 @@ like in this challange
 cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 The password is GROozWPO8QyN0mGrjUkID0WCYkZiQxrN
 
-level12 - level13 : 
+level12 - level13 : The password for the next level is stored in the file data.txt, 
+which is a hexdump of a file that has been repeatedly compressed. 
+For this level it may be useful to create a directory under /tmp 
+in which you can work. Use mkdir with a hard to guess directory name.
+ Or better, use the command “mktemp -d”. Then copy the datafile 
+using cp, and rename it using mv (read the manpages!)
 
+1 first we identify the data in the file. 
+file data.txt 
+data.txt: ASCII text 
+cat data.txt 
 
+00000000: 1f8b 0808 b83e b86a 0203 6461 7461 322e  .....>.j..data2.
+00000010: 6269 6e00 0146 02b9 fd42 5a68 3931 4159  bin..F...BZh91AY
+00000020: 2653 59fc 8b90 bd00 0019 ffff dde3 ddf7  &SY.............
+00000030: feaf 7f1f ffdf fdeb bfff f6fb bf7f 8b7f  ................
+00000040: 9ffb b7e8 ffd7 afe6 d7ff fdbd b001 3b56  ..............;V
+00000050: a100 6800 1a1a 0068 34f5 0000 6869 a1a1  ..h....h4...hi..
+00000060: a00c 9a06 8000 0d00 0000 0680 001a 00d1  ................
+00000070: 91a3 4064 1e48 189e 9911 0000 00d0 1a0f  ..@d.H..........
 
+we see Hexdum data. lets turn it into binary data. 
+we use the command 
+echo -n "data.txt" | xxd
+00000000: 6461 7461 2e74 7874                      data.txt
 
+xxd -r data.txt > data.bin (reverse the data into binary and store it in a binary file) 
+we got permission denied on this command so we need to creaete another dir within the machine. 
+mktemp -d (create a temporary directory /tmp/tmp.4mn56kf
+then you must specify dir using cd to change dir or use cd "$(mktemp -d)" in order to make dir and 
+cd into it automatically 
+$(...) is called command substitution. like when you calculate the explression within the parenthesis first
+ then the outside expression, 
+now we copy the contents of the file to another file sense we do not have access to that specific file. 
+cp /home/bandit12/data.txt . (copied to the pwd) 
+now we convert to binary using 
+xxd -r data.txt > newData.bin
+now we check the contents of the file 
+file newData.bin
+newData.bin: gzip compressed data, was "data2.bin", 
+last modified: Sat Sep 26 21:52:56 2026, max compression, from Unix, original size modulo 2^32 582
+So we can see that the file is actually compressed in gzip format 
+so we move the .bin file to .gz 
+mv newData.bin a.gz (move and rename) 
+now we decompress the file 
+gzip -d a.gz
+before we cat we check file 
+file a ----> a: bzip2 compressed data, block size = 900k
+still compressed.... 
+lets reiterate using gzip2
+mv a ab.bz2 
+now we decompress again. 
+bzip2 -d ab.bz2
+lets chack file type 
+file ab
+ab: gzip compressed data, was "data4.bin", 
+last modified: Sat Sep 26 21:52:56 2026, max compression, from Unix, original size modulo 2^32 20480
+its a gzip file again, lets decompress... 
+mv ab abc.gz
+gzip -d abc.gz 
+now we check file typ again 
+file abc
+abc: POSIX tar archive (GNU)
+lets examine this tar file 
+tar -tf abc  ---> data5.bin
+now lets extract the tar file 
+tar -xf abc now we have a data5.bin file .... 
+lets examine 
+file data5.bin 
+data5.bin: POSIX tar archive (GNU)
+lets examine and extract again.... lol 
+bandit12@bandit:/tmp/tmp.NJcA4bVZRV$ tar -tf data5.bin
+data6.bin
+bandit12@bandit:/tmp/tmp.NJcA4bVZRV$ tar -xf data5.bin
+bandit12@bandit:/tmp/tmp.NJcA4bVZRV$ ls 
+abc  data.txt  data5.bin  data6.bin  newData.txt
+bandit12@bandit:/tmp/tmp.NJcA4bVZRV$ 
+now lets examine data6.bin lol 
+file data6.bin
+data6.bin: bzip2 compressed data, block size = 900k
+no fucking wayyyyyy omg 
+ok sooooo after many decompressions you will find the hidden passowrd..
+ -----> qQYQiHOBPR8zR61qxYqX45quvihF2uzk

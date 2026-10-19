@@ -1,0 +1,33 @@
+level13 - level14 :
+ls  
+two files HINT and sshkey.private 
+one of them is a private key, used to authenticate to a server that is holding the public key. 
+ssh -i sshkey.private bandit14@localhost -p 2220 
+cannot access the bandit14 machine while in the bandit13 machine. 
+Need to trasnsfer the file from the bandit13 machine to my kali machine.. 
+scp is a useful tool for this. 
+scp -P 2220 bandit13@bandit.labs.overthewire.org:~/sshkey.private ~/bandit14_key
+now we modify the ssh command 
+ssh -i sshkey.private bandit14@bandit.labs.overtherwire.labs -p 2220
+bad permissions for the private key file... need to change permission
+chmod 600 banditkey_14
+Success 
+
+level14 -level15 : The password for the next level can be retrieved by submitting the 
+password of the current level to port 30000 on localhost.
+we run the nmap -sV localhost command 
+we see some services open
+so we use netcat 
+nc localhost 30000  password : aaWecNkG4FhxJQxz07uiwzVP6bJiYS65
+Correct!
+pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7
+
+
+level15 -level16 : The password for the next level can be retrieved by submitting the 
+password of the current level to port 30001 on localhost using SSL/TLS encryption.
+nmap -sV localhost
+nmap -p- localhost can scan all 65,535 ports
+or nmap -sV -p 30001 localhost
+now we connect... openssl s_client -connect localhost:30001 -quiet
+was able to locate password at the /etc/bandit_pass/bandit15
+kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V
